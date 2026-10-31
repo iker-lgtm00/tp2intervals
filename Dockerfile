@@ -1,6 +1,9 @@
-FROM amazoncorretto:21-alpine
-EXPOSE 8080
+FROM amazoncorretto:21-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN ./gradlew bootJar
 
-ARG JAR_PATH='boot/build/libs/tp2intervals.jar'
-COPY $JAR_PATH /app/app.jar
-ENTRYPOINT java -jar /app/app.jar
+FROM amazoncorretto:21-alpine
+WORKDIR /app
+COPY --from=builder /app/boot/build/libs/tp2intervals.jar /app/app.jar
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
